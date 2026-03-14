@@ -20,7 +20,7 @@ slice_directions = {
     "right": (slice(None), -1, slice(None), 0)
 }
 
-accepted_color_distance = 0.25
+accepted_color_distance = 0.4
 
 # Compares two lists of rgb255 colors and returns a value regarding how similar they are.
 # The test uses the average distance between the colors in the HSV cylinder radius: saturation, height: value, longitude: hue
@@ -51,7 +51,7 @@ flag_indeces = []
 index = 0
 
 # Add an empty flag for easy convergence, It can border with itself and all other flags
-ADD_EMPTY_FLAG = False
+ADD_EMPTY_FLAG = True
 
 if ADD_EMPTY_FLAG:
     flag_indeces.append(index)

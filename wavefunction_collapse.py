@@ -11,7 +11,10 @@ with open('adjacency_rules.pkl', 'rb') as f:
 flag_indeces = adjacency_rules.keys()
 
 # Add an empty flag for easy convergence, It can border with itself and all other flags
-ADD_EMPTY_FLAG = False
+ADD_EMPTY_FLAG = True
+
+# Whether to use each flag only once
+UNIQUE_FLAG = False
 
 # Create wave function
 super_flag_size = (32, 32)
@@ -31,12 +34,19 @@ for x in range(super_flag_size[0]):
 
 #print(wavefunction[0][0])
 
+used_flags = set()
+
 def collapse_and_propagate(X, Y, set_value = None):
+    global used_flags
+
     if set_value == None:
         wavefunction[X][Y] = {r.choice(list(wavefunction[X][Y]))}
         #print(wavefunction[X][Y])
     else:
         wavefunction[X][Y] = set([set_value])
+
+    if 0 not in wavefunction[X][Y] and UNIQUE_FLAG:
+        used_flags |= wavefunction[X][Y]
 
     changes = 1
     # Propagate the correction on the distributions
@@ -57,6 +67,10 @@ def collapse_and_propagate(X, Y, set_value = None):
                 if len(distribution) == 0 and not ADD_EMPTY_FLAG:
                     for i in range(4):
                         adjacency_rule[i] |= set(flag_indeces)
+
+                if UNIQUE_FLAG:
+                    for i in range(4):
+                        adjacency_rule[i] -= used_flags
 
                 # Update the distributions of the neighbours
                 for (nx, ny), allowed_adjacent in zip(directions.values(), adjacency_rule):
@@ -101,7 +115,7 @@ def get_lowest_entropy_cell(entropy):
 collapses = 1
 
 # First collapse
-collapse_and_propagate(super_flag_size[0] // 2, super_flag_size[1] // 2, set_value=5)
+collapse_and_propagate(super_flag_size[0] // 2, super_flag_size[1] // 2)
 
 while collapses < super_flag_size[0] * super_flag_size[1]:
     cx, cy = get_lowest_entropy_cell(entropy)
